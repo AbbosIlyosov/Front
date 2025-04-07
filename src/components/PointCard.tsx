@@ -3,6 +3,7 @@ import React from 'react'
 import { Button } from './ui/button'
 
 interface Point {
+  id:number,
   pointName:string,
   opensAt: string,
   closesAt: string,
@@ -10,11 +11,18 @@ interface Point {
   rating:number
 }
 
-const PointCard = (point:Point) => {
+interface PageProps {
+  point: Point
+  onClick: (point:Point) => void
+}
+
+const PointCard = ({point, onClick}:PageProps) => {
   return (
-    <div className='h-[400px] w-[265px] rounded-2xl p-5 bg-white flex flex-col justify-evenly items-center'>
-        <div className='bg-yellow-400 h-[225px] w-[225px] rounded-2xl border-3 border-[#383a49]'>
-          Image
+    <div 
+      onClick={() => onClick(point)}
+      className='h-[400px] w-[265px] rounded-2xl p-5 bg-white flex flex-col justify-evenly items-center cursor-pointer shadow-2xl hover:shadow-card-foreground'>
+        <div className='bg-yellow-400 h-[225px] w-[225px] rounded-2xl border-3 border-[#383a49] flex justify-center items-center'>
+          <img src='/' alt='logo' />
         </div>
         <h2 className='font-medium text-[20px]'>{point.pointName}</h2>
         <span className='font-[400] text-[20px]'>{point.opensAt} | {point.closesAt}</span>

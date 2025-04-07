@@ -1,16 +1,22 @@
+'use client';
+
 import React from 'react'
 import PointCard from './PointCard'
+import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
 
-interface PointCardContent {
-    pointName:string,
-    opensAt: string,
-    closesAt: string,
-    image: string,
-    rating:number
+interface Point {
+  id:number,
+  pointName:string,
+  opensAt: string,
+  closesAt: string,
+  image: string,
+  rating:number,
 }
 
-const points: PointCardContent[] = [
+const points: Point[] = [
     {
+      id: 1,
       pointName: 'AutoFix Service Center',
       opensAt: '08:00',
       closesAt: '20:00',
@@ -18,6 +24,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 2,
       pointName: 'QuickLube Express',
       opensAt: '07:30',
       closesAt: '19:30',
@@ -25,6 +32,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 3,
       pointName: 'EngineMasters Garage',
       opensAt: '09:00',
       closesAt: '18:00',
@@ -32,6 +40,7 @@ const points: PointCardContent[] = [
       rating: 1,
     },
     {
+      id: 4,
       pointName: 'Speedy Tires',
       opensAt: '08:00',
       closesAt: '21:00',
@@ -39,6 +48,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 5,
       pointName: 'DriveSafe Car Care',
       opensAt: '10:00',
       closesAt: '22:00',
@@ -46,6 +56,7 @@ const points: PointCardContent[] = [
       rating: 3,
     },
     {
+      id: 6,
       pointName: 'Revved Up Auto Service',
       opensAt: '06:30',
       closesAt: '18:30',
@@ -53,6 +64,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 7,
       pointName: 'Precision Auto Repairs',
       opensAt: '07:00',
       closesAt: '19:00',
@@ -60,6 +72,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 8,
       pointName: 'TurboTech Mechanics',
       opensAt: '09:00',
       closesAt: '20:00',
@@ -67,6 +80,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 9,
       pointName: 'PitStop Service Hub',
       opensAt: '10:00',
       closesAt: '22:00',
@@ -74,6 +88,7 @@ const points: PointCardContent[] = [
       rating: 3,
     },
     {
+      id: 10,
       pointName: 'CarCare Professionals',
       opensAt: '08:00',
       closesAt: '19:00',
@@ -81,6 +96,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 11,
       pointName: 'WheelsPlus Auto Service',
       opensAt: '09:00',
       closesAt: '20:00',
@@ -88,6 +104,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 12,
       pointName: 'AllTune Car Service',
       opensAt: '08:30',
       closesAt: '18:30',
@@ -95,6 +112,7 @@ const points: PointCardContent[] = [
       rating: 1,
     },
     {
+      id: 13,
       pointName: 'LubeMasters Express',
       opensAt: '07:30',
       closesAt: '20:30',
@@ -102,6 +120,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 14,
       pointName: 'AutoCare Specialists',
       opensAt: '08:00',
       closesAt: '22:00',
@@ -109,6 +128,7 @@ const points: PointCardContent[] = [
       rating: 3,
     },
     {
+      id: 15,
       pointName: 'SpeedLine Car Service',
       opensAt: '06:00',
       closesAt: '19:00',
@@ -116,6 +136,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 16,
       pointName: 'Elite Auto Shop',
       opensAt: '08:00',
       closesAt: '20:00',
@@ -123,6 +144,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 17,
       pointName: 'PerfectTune Auto Center',
       opensAt: '09:30',
       closesAt: '21:00',
@@ -130,6 +152,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 18,
       pointName: 'TopGear Car Service',
       opensAt: '10:00',
       closesAt: '22:00',
@@ -137,6 +160,7 @@ const points: PointCardContent[] = [
       rating: 5,
     },
     {
+      id: 19,
       pointName: 'The Auto Doctor',
       opensAt: '07:30',
       closesAt: '20:30',
@@ -144,6 +168,7 @@ const points: PointCardContent[] = [
       rating: 4,
     },
     {
+      id: 20,
       pointName: 'CarFix Garage',
       opensAt: '08:00',
       closesAt: '18:00',
@@ -151,54 +176,65 @@ const points: PointCardContent[] = [
       rating: 2,
     },
     {
+      id: 21,
       pointName: 'GarageWorks Auto Repair',
       opensAt: '09:00',
       closesAt: '20:00',
       image: 'https://via.placeholder.com/150?text=GarageWorks+Auto',
       rating: 5,
     },
-    {
-      pointName: 'MasterMechanics',
-      opensAt: '06:30',
-      closesAt: '18:30',
-      image: 'https://via.placeholder.com/150?text=MasterMechanics',
-      rating: 4,
-    },
-    {
-      pointName: 'TireTech Service Center',
-      opensAt: '08:00',
-      closesAt: '19:00',
-      image: 'https://via.placeholder.com/150?text=TireTech+Service',
-      rating: 5,
-    },
-    {
-      pointName: 'QuickFix Auto Care',
-      opensAt: '10:00',
-      closesAt: '22:00',
-      image: 'https://via.placeholder.com/150?text=QuickFix+Auto+Care',
-      rating: 4,
-    },
-    {
-      pointName: 'Precision Car Service',
-      opensAt: '09:30',
-      closesAt: '20:30',
-      image: 'https://via.placeholder.com/150?text=Precision+Car+Service',
-      rating: 1,
-    },
+    // {
+    //   pointName: 'MasterMechanics',
+    //   opensAt: '06:30',
+    //   closesAt: '18:30',
+    //   image: 'https://via.placeholder.com/150?text=MasterMechanics',
+    //   rating: 4,
+    // },
+    // {
+    //   pointName: 'TireTech Service Center',
+    //   opensAt: '08:00',
+    //   closesAt: '19:00',
+    //   image: 'https://via.placeholder.com/150?text=TireTech+Service',
+    //   rating: 5,
+    // },
+    // {
+    //   pointName: 'QuickFix Auto Care',
+    //   opensAt: '10:00',
+    //   closesAt: '22:00',
+    //   image: 'https://via.placeholder.com/150?text=QuickFix+Auto+Care',
+    //   rating: 4,
+    // },
+    // {
+    //   pointName: 'Precision Car Service',
+    //   opensAt: '09:30',
+    //   closesAt: '20:30',
+    //   image: 'https://via.placeholder.com/150?text=Precision+Car+Service',
+    //   rating: 1,
+    // },
   ];
   
 
 const PointGrid = () => {
+  const router = useRouter();
+
+  const handleClickCard = (point:Point) => {
+    router.push('/points/' + point.id + '/appointments');
+  }
+
   return (
-    <div className='w-full flex gap-5 flex-wrap justify-start p-5'>
+    <div className='h-full w-full py-5 overflow-auto'>
+      <div className='w-full flex gap-5 flex-wrap justify-center'>
         {points.map((point, index) => (<PointCard 
             key={index} 
-            pointName={point.pointName} 
-            image={point.image} 
-            opensAt={point.opensAt}
-            closesAt={point.closesAt}
-            rating={point.rating}
+            point = {point}
+            onClick={handleClickCard}
             />))}
+      </div>
+      <div className='flex justify-center mt-10'>
+        <Button className='cursor-pointer'>
+            Load More
+        </Button>
+      </div>
     </div>
   )
 }

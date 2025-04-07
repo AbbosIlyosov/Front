@@ -1,3 +1,4 @@
+import PointFilterCard from '@/components/PointFilterCard'
 import PointGrid from '@/components/PointGrid'
 import ServiceTypeMenu from '@/components/ServiceTypeMenu'
 import { Button } from '@/components/ui/button'
@@ -35,34 +36,16 @@ const MapPage = () => {
     <main className='flex gap-0 h-[calc(100vh-80px)] overflow-hidden'>
       
       {/* Side Nav */}
-      <div className='basis-xs shrink-0 flex flex-col gap-4 p-2'>
-
-        {/* Search bar */}
-        <div className="relative mt-3 mb-3">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search..." 
-            className="pl-9 w-full"
-          />
-        </div>
-      
-        {/* Service Type */}
-        <ServiceTypeMenu/>
-
-        {/* Location */}
-        <h2 className="font-medium px-1 mt-3">Location</h2>
-        <SelectList label='City' options={uzbekistanCities} />
-
-        {/* Filter Button */}
-        <div className="flex justify-end">
-            <Button className="mt-4 cursor-pointer">Filter</Button>
-          </div>
-
-      </div>
+      <PointFilterCard/>
 
       {/* Main Content */}
-      <div className='bg-gray-100 grow p-5 overflow-auto'>
-        <PointGrid/>
+      <div className='relative w-full h-full overflow-hidden'>
+        <div 
+            className="absolute top-0 right-0 inset-0 bg-cover bg-center bg-no-repeat -z-10 before:content-[''] before:absolute before:inset-0 before:backdrop-blur-none"
+            style={{backgroundImage: "url('/backgrounds/PointAppointmentBackground.png')"}}
+          >
+        </div>
+         <PointGrid/>
       </div>
     </main>
   )

@@ -1,33 +1,40 @@
-import { parse } from "cookie";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_PATHS = ['/login', '/register'];
-// const ADMIN_PATHS = ['/admin-panel'];
 
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const path = pathname.toLowerCase();
 
-export function middleware(request:NextRequest){
-    const { pathname } = request.nextUrl;
-
-    if(PUBLIC_PATHS.includes(pathname)){
-        return NextResponse.next();
-    }
-
-    const cookie = request.headers.get('cookie') || '';
-    const cookies = parse(cookie);
-    const token = cookies['auth_token'];
-
-    if(!token){
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
-
+  // Allow public paths without auth
+  if (PUBLIC_PATHS.includes(path)) {
     return NextResponse.next();
+  }
+
+  // get token from cookies
+  const token = request.cookies.get('access_token')?.value;
+
+  console.log('MIDDLEWARE: token ->', token);
+
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+  else if(path == '/'){
+    return NextResponse.redirect(new URL('/points', request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: [
-        '/',
-        // '/map/:path*',
-        // '/businesses/:path*',
-        // '/points/:path*'
-    ]
-}
+  matcher: [
+    '/',
+    '/map/:path*',
+    '/businesses/:path*',
+    '/workers/:path*',
+    '/appointments/:path*',
+    '/points/:path*',
+    '/admin-panel/:path*',
+    '/profile/:path*',
+  ],
+};

@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import Swal from 'sweetalert2';
+import { useAuthUser } from '@/components/AuthUserProvider';
 import { loginAction } from '@/actions/login';
 
 // interface LoginResponse {
@@ -21,30 +21,49 @@ const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { setAuthenticatedUser } = useAuthUser();
+  const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
+  
+    startTransition(async () => {
+      try {
+        const res = await loginAction(email, password);
 
-    try {
-      const isSuccess = await loginAction(email, password);
+        if (res && res.user) {
 
-      if(isSuccess){
-        router.push('/points');
+          setAuthenticatedUser(res.user);
+
+          Swal.fire({
+            title: 'Welcome!',
+            text: 'Login Successful.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+  
+          router.push('/points');
+        } else {
+          Swal.fire({
+            title: 'Oops!',
+            text: res?.error || 'Login failed. Check your credentials and try again.',
+            icon: 'error',
+          });
+        }
+  
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Something went wrong!';
+        Swal.fire({
+          title: 'Oops!',
+          text: message,
+          icon: 'error',
+        });
       }
-      else{
-        throw new Error("Login failed.");
-      }
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
+  
 
   return (
     <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative flex justify-center items-center'>
@@ -62,12 +81,6 @@ const Login = () => {
         </CardHeader>
         
         <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -78,7 +91,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isPending}
               />
             </div>
             
@@ -98,7 +111,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isPending}
               />
             </div>
             
@@ -110,9 +123,9 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full cursor-pointer" 
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isPending ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
         </CardContent>

@@ -67,7 +67,7 @@ const AuthHeaderDisplay = () => {
 
         {/* User Info */}
         <div className="flex flex-col leading-tight">
-          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '16px' }}>{authenticatedUser.username}</span>
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '16px' }}>{authenticatedUser.firstName} {authenticatedUser.lastName}</span>
           <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', opacity: 0.8 }}>
             {authenticatedUser.role}
           </span>

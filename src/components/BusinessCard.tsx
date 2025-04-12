@@ -1,19 +1,24 @@
-import React from 'react'
+import { BusinessGridInfo } from '@/interfaces/Business';
+import Image from 'next/image';
+import React, { FC } from 'react'
 
-interface BusinessInfo {
-    busineessName: string;
-    businessLogo: string[] | null;
+interface BusinessCardProps {
+    business: BusinessGridInfo;
   }
 
-const BusinessCard = (business:BusinessInfo) => {
+const BusinessCard:FC<BusinessCardProps> = ({business}) => {
   return (
-    <div className='bg-gray-50 h-[150px] w-[400] rounded-2xl border-2 shadow-xl p-2 flex gap-3 items-center cursor-pointer hover:shadow-[gray]'>
-        <div className='bg-yellow-300  border-[#383a49] h-[130px] w-[130px] rounded-2xl border-4 flex justify-center items-center'>
-            <img src='/' alt='logo'/>
-        </div>
-        <h3 className='font-bold text-2xl'>
-            {business.busineessName}
-        </h3>
+    <div className='bg-gray-200 h-[150px] w-[400] rounded-2xl border-2 shadow-xl p-2 flex gap-3 items-center cursor-pointer hover:shadow-[gray]'>
+      <div className='border-[#383a49] h-[130px] w-[130px] rounded-2xl border-2 flex justify-center items-center p-0 relative'>
+        <Image fill unoptimized
+          src={`data:image/png;base64,${business?.logo}`}
+          alt="logo"
+          className="object-cover"
+        />
+      </div>
+      <h3 className='font-bold text-2xl'>
+        {business.name} <hr />
+      </h3>
     </div>
   )
 }

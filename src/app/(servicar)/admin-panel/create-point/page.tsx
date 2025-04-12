@@ -1,8 +1,8 @@
 
 'use client';
 
-import { createBusiness } from '@/actions/servicar/business/createBusiness';
 import { fetchCategoriesAction } from '@/actions/servicar/category/fetchCategories';
+import { createPointAction } from '@/actions/servicar/point/createPoint';
 import { FileUploader } from '@/components/FileUploader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label'
 import SelectList from '@/components/ui/select-list'
 import { Textarea } from '@/components/ui/textarea'
 import { Category } from '@/interfaces/Category';
-import { CreateBusinessPayload } from '@/interfaces/CreateBusinessPayload';
+import { CreatePointPayload } from '@/interfaces/CreatePointPayload';
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { redirect, useRouter } from 'next/navigation';
 import React, { FormEvent, useEffect, useState } from 'react'
 import Swal from 'sweetalert2';
 
-const CreateBusiness = () => {
+const CreatePoint = () => {
     
     // add email, name, categories, aboutUs, image
     const [email, setEmail] = useState<string>('');
@@ -100,22 +100,25 @@ const CreateBusiness = () => {
         
         try {
             // Construct the payload
-            const payload:CreateBusinessPayload = {
-                email,
-                name,
-                categories: selectedCategories,
-                aboutUs,
-                image: image
+            const payload: CreatePointPayload = {
+                pointName: "Mock Point Name",
+                workingTimeId: 1,
+                locationId: 101,
+                businessId: 501,
+                categories: [1, 2, 3],
+                image: image, // assuming `image` is already a base64 string like "data:image/png;base64,..."
+                userId: 999,
             };
+  
             
             console.log('payload', payload);
 
-            const { success, errorMessage } = await createBusiness(payload);
+            const { success, errorMessage } = await createPointAction(payload);
 
             if (success) {
 
                 Swal.fire({
-                    text: "Business created successfully.",
+                    text: "Point added successfully.",
                     icon: "success",
                     confirmButtonText:'Create Another',
                     confirmButtonColor:'#383a49',
@@ -210,7 +213,7 @@ const CreateBusiness = () => {
         
         <div className='w-sm flex flex-col gap-5 items-center'>
             <h2 className='font-bold text-2xl'>
-                Add New Business
+                Add New Point
             </h2>
             <form onSubmit={handleSubmit} method="post" className='w-full flex flex-col gap-3'>
                 {error.length > 0 && <span className='text-red-600 border-1 border-red-500 px-3 py-3'>
@@ -218,11 +221,11 @@ const CreateBusiness = () => {
                 </span>}
                 {/* email input */}
                 <div className='space-y-2'>
-                    <Label className='grow-1' htmlFor="email">Email: </Label>
+                    <Label className='grow-1' htmlFor="pointName">Point Name: </Label>
                     <Input 
-                        id="email"
-                        type="email"
-                        placeholder="name@example.com"
+                        id="pointName"
+                        type="text"
+                        placeholder="Enter point name"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isLoading}
@@ -231,21 +234,41 @@ const CreateBusiness = () => {
                     />
                 </div>
 
-                {/* businessName input */}
+                {/* Workingtime input */}
                 <div className='space-y-2'>
-                    <Label htmlFor="name">Business Name: </Label>
-                    <Input 
-                        id="name"
-                        type="text"
-                        placeholder="your business name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={isLoading}
-                        className='px-4 py-2'
-                        required
+                    <Label htmlFor="categories">Working Time: </Label>
+                    <SelectList 
+                        selectListLabel='Working Time' 
+                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
+                        selected={selectedCategories[0]}
+                        setSelected={() => setSelectedCategories(categories ?? [])}
+                        getOptionLabel={(item) => item.name}
                     />
                 </div>
 
+                {/* Location input */}
+                <div className='space-y-2'>
+                    <Label htmlFor="categories">Location: </Label>
+                    <SelectList 
+                        selectListLabel='City' 
+                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
+                        selected={selectedCategories[0]}
+                        setSelected={() => setSelectedCategories(categories ?? [])}
+                        getOptionLabel={(item) => item.name}
+                    />
+                </div>
+
+                {/* Business input */}
+                <div className='space-y-2'>
+                    <Label htmlFor="categories">Business: </Label>
+                    <SelectList 
+                        selectListLabel='Business' 
+                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
+                        selected={selectedCategories[0]}
+                        setSelected={() => setSelectedCategories(categories ?? [])}
+                        getOptionLabel={(item) => item.name}
+                    />
+                </div>
 
                 {/* Category input */}
                  <div className='space-y-2'>
@@ -259,19 +282,6 @@ const CreateBusiness = () => {
                     />
                 </div>
 
-                {/* AboutUs input */}
-                <div className='space-y-2'>
-                    <Label htmlFor="aboutUs">About Us: </Label>
-                    <Textarea 
-                        id='aboutUs' 
-                        placeholder='Write about yuour business...' 
-                        value={aboutUs}
-                        onChange={(e) =>  setAboutUs(e.target.value)}
-                        disabled={isLoading}
-                        required
-                    />
-                </div>
-
                 {/* Logo input */}
                 <div className='space-y-2'>
                     <Label htmlFor="logo">Logo: </Label>
@@ -281,14 +291,14 @@ const CreateBusiness = () => {
                             <X onClick={() => setSelectedFile(null)} color='red' className='hover:bg-gray-400 cursor-pointer' />
                         </div>): 
                         <FileUploader 
-                            label="Upload business logo:"
+                            label="Upload logo for the point"
                             accept=".png,.jpg,.jpeg"
                             onFileSelect={setSelectedFile}
                         />
                     }
                 </div>
                 
-                <Button className='w-full cursor-pointer bg-[#383a49]'>
+                <Button type='submit' className='w-full cursor-pointer bg-[#383a49]'>
                     {isLoading ? 'Submitting...': 'Submit'}
                 </Button>
                 <Button variant={'outline'} onClick={() => router.back()} className='w-full cursor-pointer'>
@@ -300,4 +310,4 @@ const CreateBusiness = () => {
   )
 }
 
-export default CreateBusiness
+export default CreatePoint

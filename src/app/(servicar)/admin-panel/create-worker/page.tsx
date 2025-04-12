@@ -7,12 +7,15 @@ import { Label } from '@/components/ui/label'
 import SelectList from '@/components/ui/select-list'
 import { BusinessSelectList } from '@/interfaces/Business';
 import { useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 
 const CreateWorker = () => {
 
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessSelectList>();
+
+  const router = useRouter();
 
   const { data: businesses, isLoading: businessLoading, error: businessError } = useQuery({
     queryKey: ['business-select-list'],
@@ -41,7 +44,7 @@ const CreateWorker = () => {
             <h2 className='font-bold text-2xl'>
                 Add New Worker
             </h2>
-            <form action="" method="post" className='w-full flex flex-col gap-3'>
+            <form action={() => {}} className='w-full flex flex-col gap-3'>
                 {/* email input */}
                 <div className='space-y-2'>
                     <Label className='grow-1' htmlFor="email">Email: </Label>
@@ -71,8 +74,11 @@ const CreateWorker = () => {
 
                 {/* Category input */}
                 
-                <Button className='w-full cursor-pointer'>
+                <Button type='submit' className='w-full cursor-pointer'>
                     Submit
+                </Button>
+                <Button variant={'outline'} onClick={() => router.back()} className='w-full cursor-pointer'>
+                  Back
                 </Button>
             </form>
         </div>

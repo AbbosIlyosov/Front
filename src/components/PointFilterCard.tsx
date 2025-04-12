@@ -1,34 +1,24 @@
+'use client';
+
 import { Search } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { Input } from './ui/input'
 import ServiceTypeMenu from './ServiceTypeMenu'
 import SelectList from './ui/select-list'
 import { Button } from './ui/button'
-
-const uzbekistanCities = [
-    "Tashkent",
-    "Samarkand",
-    "Bukhara",
-    "Namangan",
-    "Andijan",
-    "Fergana",
-    "Nukus",
-    "Khiva",
-    "Termez",
-    "Kokand",
-    "Jizzakh",
-    "Gulistan",
-    "Navoi",
-    "Urganch",
-    "Qarshi",
-    "Margilan",
-    "Angren",
-    "Chirchiq",
-    "Shahrisabz",
-    "Zarafshon"
-  ];
+import { useQuery } from '@tanstack/react-query'
+import { fetchLocations } from '@/actions/servicar/location/fetchLocations'
+import { Location } from '@/interfaces/Location'
 
 const PointFilterCard = () => {
+
+  const [selectedLocation, setSelectedLocation ] = useState<Location>();
+
+  const {data: locations, isLoading: locationLoading, error: locationError} = useQuery({
+    queryKey: ['locations'],
+    queryFn: fetchLocations
+  })
+
   return (
     <div className='basis-xs shrink-0 flex flex-col gap-4 p-2'>
 
@@ -46,7 +36,13 @@ const PointFilterCard = () => {
 
         {/* Location */}
         <h2 className="font-medium px-1 mt-3">Location</h2>
-        <SelectList label='City' options={uzbekistanCities} />
+        <SelectList 
+          selectListLabel='City' 
+          options={locations ?? [{id:0, city: locationLoading ? 'Loading...' : 'Not Found'}]} 
+          selected={selectedLocation}
+          setSelected={setSelectedLocation}
+          getOptionLabel={(option) => option.city}
+        />
 
         {/* Filter Button */}
         <div className="flex justify-end">

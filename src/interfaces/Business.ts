@@ -12,3 +12,7 @@ export interface BusinessSelectList {
     id: number, 
     name: string
 }
+
+export interface BusinessGridInfo extends BusinessSelectList {
+    logo: string
+}

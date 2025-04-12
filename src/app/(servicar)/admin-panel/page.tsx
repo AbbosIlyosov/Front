@@ -22,6 +22,9 @@ const AdminPanel = () => {
             <Button onClick={() => router.push('/admin-panel/create-worker')} className='w-full cursor-pointer'>
                 Add Worker
             </Button>
+            <Button onClick={() => router.push('/admin-panel/create-point')} className='w-full cursor-pointer'>
+                Add Point
+            </Button>
             <Button onClick={() => router.push('/admin-panel/create-business')} className='w-full cursor-pointer'>
                 Add Business
             </Button>

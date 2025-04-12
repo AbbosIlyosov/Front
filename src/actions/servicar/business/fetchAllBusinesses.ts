@@ -1,7 +1,7 @@
 'use server';
 
 import axios from '@/lib/axios';
-import { Business } from '@/interfaces/Business';
+import { Business, BusinessGridInfo, BusinessSelectList } from '@/interfaces/Business';
 
 export async function fetchAllBusinesses(): Promise<Business[]> {
   try {
@@ -26,7 +26,7 @@ export async function fetchBusinessesForSelectList(): Promise<Business[]> {
   }
 }
 
-export async function fetchBusinessesForGrid(): Promise<Business[]> {
+export async function fetchBusinessesForGrid(): Promise<BusinessGridInfo[]> {
   try {
     const res = await axios.get('/business/get-grid-info');
 

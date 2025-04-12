@@ -28,10 +28,10 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 items-center w-full">
       <Label className="text-base font-medium">{label}</Label>
-      <div className="flex items-center gap-4">
-        <Button type="button" onClick={handleButtonClick}>
+      <div className="w-full flex items-center gap-4">
+        <Button type="button" className='w-full cursor-pointer bg-[#383a49]' onClick={handleButtonClick}>
           Choose File
         </Button>
         <Input

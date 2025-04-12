@@ -1,5 +1,7 @@
 'use client';
 
+import { useAuthUser } from '@/components/AuthUserProvider';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import React, { FC, useEffect, useState } from 'react'
 
@@ -55,14 +57,11 @@ type ProfileInfoProps = {
 }
 
 export const ProfileInfoCard:FC<ProfileInfoProps> = ({changeInfo, changePassword, switchToWorkerAccount}) => {
-    const avatar = null;
 
-    const getInitials = (name: string): string => {
-        return name
-          .split(' ')
-          .map((word) => word[0])
-          .join('')
-          .toUpperCase();
+    const {authenticatedUser} = useAuthUser();
+
+    const getInitials = (firstName: string, lastName:string): string => {
+        return `${firstName[0]}${lastName[0]}`.toUpperCase()
     };
 
   return (
@@ -70,15 +69,16 @@ export const ProfileInfoCard:FC<ProfileInfoProps> = ({changeInfo, changePassword
             {/* Heading */}
             <div className='flex gap-5 items-center'>
                 {/* Avatar */}
-                <div
-                    className='h-[90px] w-[90px] rounded-[50%] bg-[#383a49] flex justify-center items-center text-[50px] text-white'
-                >
-                    {avatar ? '' : getInitials("Jan Doe")}
-                </div>
+                <Avatar className='h-[90px] w-[90px] text-[40px]'>
+                    <AvatarImage src={authenticatedUser?.imageUrl} />
+                    <AvatarFallback>{getInitials(authenticatedUser?.firstName ?? 'N', authenticatedUser?.lastName ?? '/A')}</AvatarFallback>
+                </Avatar>
+                
+                {/* className='h-[90px] w-[90px] rounded-[50%] flex justify-center items-center text-[50px] text-black bg-white' */}
 
                 {/* Name and Registered Date */}
                 <div>
-                    <h2 className='text-[30px] font-[700]'>Jane Doe</h2>
+                    <h2 className='text-[30px] font-[700]'>{`${authenticatedUser?.firstName} ${authenticatedUser?.lastName}`}</h2>
                     <span className=''>Registered: 29.01.25</span>
                 </div>
             </div>
@@ -86,8 +86,9 @@ export const ProfileInfoCard:FC<ProfileInfoProps> = ({changeInfo, changePassword
             {/* Personal Info */}
             <div>
                 <h3 className='text-[22px] font-[600] mb-1'>Personal Info</h3>
-                <p><b>Phone number :</b> +998 (90) 123-45-67</p>
-                <p><b>Email :</b> jdoe@abc.com</p>
+                <p><b>Username :</b> {authenticatedUser?.username}</p>
+                <p><b>Phone number :</b> {authenticatedUser?.phoneNumber}</p>
+                <p><b>Email :</b> {authenticatedUser?.email}</p>
             </div>
 
             {/* About Me */}
@@ -126,24 +127,16 @@ const ProfilePage = () => {
     }
 
   return (
-    <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative'>
-        <div 
-            className="absolute inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
-            style={{backgroundImage: "url('/backgrounds/ProfileBackground.png')"}}
-        ></div>
-
-        {showEditForm ? 
-            <EditProfileForm showEditForm={(value:boolean) => setShowEditForm(value)} /> : 
-                showPasswordChangeForm ? 
-                    <ChangePasswordForm showPasswordChangeForm={(value: boolean) => setShowPasswordChangeForm(value)} /> : 
-                        <ProfileInfoCard 
-                            changeInfo={() =>  setShowEditForm(true)} 
-                            changePassword={() =>  setShowPasswordChangeForm(true)}
-                            switchToWorkerAccount={() =>  console.log("Switched to worker account.")}
-                        />}
-
-    </main>
-  )
+    showEditForm ? 
+    <EditProfileForm showEditForm={(value:boolean) => setShowEditForm(value)} /> : 
+    showPasswordChangeForm ? 
+        <ChangePasswordForm showPasswordChangeForm={(value: boolean) => setShowPasswordChangeForm(value)} /> : 
+        <ProfileInfoCard 
+            changeInfo={() =>  setShowEditForm(true)} 
+            changePassword={() =>  setShowPasswordChangeForm(true)}
+            switchToWorkerAccount={() =>  console.log("Switched to worker account.")}
+        />
+    );
 }
 
 export default ProfilePage

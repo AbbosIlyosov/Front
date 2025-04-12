@@ -1,18 +1,24 @@
 'use client';
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuthUser } from './AuthUserProvider';
-import { Button } from './ui/button';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { clearAuthCookies } from '@/lib/cookies';
 import Swal from 'sweetalert2';
 import { redirect } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const AuthHeaderDisplay = () => {
   const { authenticatedUser, setAuthenticatedUser } = useAuthUser();
 
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [ isHydrated, setIsHydrated] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, [])
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -35,6 +41,10 @@ const AuthHeaderDisplay = () => {
     redirect('/login');
   }
 
+  if(!isHydrated){
+    return null;
+  }
+
   if(!authenticatedUser){
     return <LoginRegisterButtons/>
   }
@@ -42,54 +52,29 @@ const AuthHeaderDisplay = () => {
   return (
     <div className="flex items-center space-x-4 relative">
       <div
-              onClick={toggleDropdown}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                cursor: 'pointer',
-              }}
-            >
-              {/* Avatar */}
-              {authenticatedUser.imageUrl ? (
-                <img
-                  src={authenticatedUser.imageUrl}
-                  alt={authenticatedUser.username}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: '#5C5F79',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '18px',
-                  }}
-                >
-                  {getInitials(authenticatedUser.firstName, authenticatedUser.lastName)}
-                </div>
-              )}
+        onClick={toggleDropdown}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          cursor: 'pointer',
+        }}
+      >
+        <Avatar className='text-black'>
+          <AvatarImage src={authenticatedUser.imageUrl} />
+          <AvatarFallback>{getInitials(authenticatedUser.firstName, authenticatedUser.lastName)}</AvatarFallback>
+        </Avatar>
 
-              {/* User Info */}
-              <div className="flex flex-col leading-tight">
-                <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '16px' }}>{authenticatedUser.firstName} {authenticatedUser.lastName}</span>
-                <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', opacity: 0.8 }}>
-                  {authenticatedUser.role}
-                </span>
-              </div>
+        {/* User Info */}
+        <div className="flex flex-col leading-tight">
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '16px' }}>{authenticatedUser.username}</span>
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12px', opacity: 0.8 }}>
+            {authenticatedUser.role}
+          </span>
+        </div>
 
-              {/* Chevron */}
-              <ChevronDown size={18} color="white" />
+        {/* Chevron */}
+        <ChevronDown size={18} color="white" />
       </div>
 
       {/* Dropdown */}
@@ -108,7 +93,8 @@ const AuthHeaderDisplay = () => {
               }}
             >
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                <li><DropdownLink href="/admin-panel" text="Admin Panel" onClick={toggleDropdown} /></li>
+                {authenticatedUser.role.toLowerCase() == 'admin' && 
+                <li><DropdownLink href="/admin-panel" text="Admin Panel" onClick={toggleDropdown} /></li>}
                 <li><DropdownLink href="/profile" text="Profile" onClick={toggleDropdown} /></li>
                 <li><DropdownLink href="/appointments" text="Appointments" onClick={toggleDropdown} /></li>
                 <li><DropdownLink href="/reviews" text="Reviews" onClick={toggleDropdown} /></li>

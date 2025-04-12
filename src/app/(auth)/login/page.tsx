@@ -7,15 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import Swal from 'sweetalert2';
 import { useAuthUser } from '@/components/AuthUserProvider';
-import { loginAction } from '@/actions/login';
-
-// interface LoginResponse {
-//   success: boolean;
-//   message?: string;
-// }
+import { loginAction } from '@/actions/auth/login';
 
 const Login = () => {
   const router = useRouter();
@@ -66,13 +60,7 @@ const Login = () => {
   
 
   return (
-    <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative flex justify-center items-center'>
-      <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0 before:backdrop-blur-xs"
-          style={{backgroundImage: "url('/backgrounds/Background.png')"}}
-        >
-        </div>
-      <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
           <CardDescription className="text-center">
@@ -115,10 +103,10 @@ const Login = () => {
               />
             </div>
             
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <Checkbox id="remember" />
               <Label htmlFor="remember" className="text-sm">Remember me</Label>
-            </div>
+            </div> */}
             
             <Button 
               type="submit" 
@@ -138,8 +126,7 @@ const Login = () => {
             </Link>
           </div>
         </CardFooter>
-      </Card>
-      </main>
+    </Card>
   );
 }
 

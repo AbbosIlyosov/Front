@@ -1,6 +1,6 @@
 'use server';
 
-import { AuthenticatedUser } from '@/types/AuthenticatedUser';
+import { AuthenticatedUser } from '@/interfaces/AuthenticatedUser';
 import { cookies } from 'next/headers';
 
 export async function setAuthCookies(accessToken: string, expiry: string, user: AuthenticatedUser) {
@@ -29,6 +29,7 @@ export async function setAuthCookies(accessToken: string, expiry: string, user: 
   cookieStore.set('auth_user', JSON.stringify(user), {
     secure: true,
     sameSite: 'strict',
+    maxAge: diff/1000
   });
 }
 

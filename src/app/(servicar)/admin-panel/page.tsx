@@ -19,10 +19,10 @@ const AdminPanel = () => {
             <h2 className='font-bold text-2xl'>
                 Admin Panel
             </h2>
-            <Button onClick={() => router.push('/workers/create')} className='w-full cursor-pointer'>
+            <Button onClick={() => router.push('/admin-panel/create-worker')} className='w-full cursor-pointer'>
                 Add Worker
             </Button>
-            <Button onClick={() => router.push('/businesses/create')} className='w-full cursor-pointer'>
+            <Button onClick={() => router.push('/admin-panel/create-business')} className='w-full cursor-pointer'>
                 Add Business
             </Button>
         </div>

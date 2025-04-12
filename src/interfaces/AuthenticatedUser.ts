@@ -1,4 +1,4 @@
-export type AuthenticatedUser  = {
+export interface AuthenticatedUser {
     id: number,
     username: string, 
     firstName : string, 
@@ -7,5 +7,5 @@ export type AuthenticatedUser  = {
     phoneNumber: string,
     isCompanyWoker: false,
     role: string,
-    imageUrl: string | null
+    imageUrl: string | undefined
   }

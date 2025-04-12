@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -10,23 +9,25 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { registerAction } from '@/actions/auth/register';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 
-interface SignupResponse {
-  success: boolean;
-  message?: string;
-}
 
 const Register = () => {
 
-    const router = useRouter();
-    const [fullName, setFullName] = useState<string>('');
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [phone, setPhone] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
   
+    const router = useRouter();
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault();
       
@@ -45,40 +46,39 @@ const Register = () => {
       setError('');
   
       try {
-        // Replace this with your actual registration logic
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            fullName, 
-            email, 
-            password 
-          }),
-        });
+
+        const { success, errorMessage } = await registerAction({firstName, lastName, email, password, phone });
   
-        const data: SignupResponse = await response.json();
-  
-        if (!response.ok) {
-          throw new Error(data.message || 'Registration failed');
+        if(success){
+
+          Swal.fire({
+            text: 'Account created successfully.',
+            timer: 1500,
+            icon:'success',
+            showConfirmButton: false
+          })
+          router.push('/login');
+
         }
-  
-        // Redirect to login page or directly to dashboard
-        router.push('/login?registered=true');
+        else{
+
+          setError(errorMessage ?? 'Oops! an unknown error occured.');
+
+        }
+
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred during registration');
+
+        setError(err instanceof Error ? JSON.stringify(err) : 'An error occurred during registration');
+
       } finally {
+
         setIsLoading(false);
+        
       }
     };
   
     return (
-      <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative flex justify-center items-center'>
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0 before:backdrop-blur-xs"
-          style={{backgroundImage: "url('/backgrounds/Background.png')"}}
-        >
-        </div>
-        <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
             <CardDescription className="text-center">
@@ -94,54 +94,86 @@ const Register = () => {
             )}
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
+              <div className='flex justify-between gap-5'>
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Enter your first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Enter your last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
+              <div className='flex gap-5 justify-between'>
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="text"
+                    placeholder="0000000000"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
+
+              <div className='flex gap-5 justify-between'>
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                
+                <div className="space-y-2 grow-1">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               
               <div className="flex items-center space-x-2">
@@ -178,7 +210,6 @@ const Register = () => {
             </div>
           </CardFooter>
         </Card>
-      </main>
     );
 }
 

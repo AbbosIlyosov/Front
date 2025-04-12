@@ -1,4 +1,4 @@
-export type LoginResponse = {
+export interface LoginResponse {
     accessToken: string,
     tokenExpiry : Date,
     userId: number

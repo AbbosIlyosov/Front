@@ -3,6 +3,7 @@ import { Passion_One, Poppins } from "next/font/google";
 import "./globals.css";
 import AppHeader from "@/components/AppHeader";
 import { AuthUserProvider } from "@/components/AuthUserProvider";
+import ReactQueryProvider from "@/components/ReactQueryProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -30,10 +31,12 @@ export default function AppLayout({
       <body
         className={`${poppins.variable} ${passionOne.variable} antialiased relative`}
       >
-        <AuthUserProvider>
-          <AppHeader />
-          {children}
-        </AuthUserProvider>
+        <ReactQueryProvider>
+          <AuthUserProvider>
+            <AppHeader />
+            {children}
+          </AuthUserProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

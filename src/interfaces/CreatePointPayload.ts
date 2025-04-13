@@ -4,6 +4,5 @@ export interface CreatePointPayload {
     locationId: number,
     businessId: number,
     categories: number[]
-    image: string,
-    userId: number
+    // image: string
 }

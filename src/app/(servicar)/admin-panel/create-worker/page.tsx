@@ -33,9 +33,9 @@ const CreateWorker = () => {
   }, [businessError])
 
   return (
-    <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative'>
+    <main className='h-[calc(100vh-80px)] overflow-auto p-5 relative'>
       <div 
-        className="absolute inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
+        className="fixed inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
         style={{backgroundImage: "url('/backgrounds/PointAppointmentBackground.png')"}}
       >
       </div>

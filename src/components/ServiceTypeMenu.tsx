@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Button } from './ui/button'
-import { CarTaxiFront, Fuel, LifeBuoy, Settings, Wrench } from 'lucide-react'
+import { CarTaxiFront, Fuel, LifeBuoy, ListCheck, Settings, Wrench } from 'lucide-react'
 import { Category } from '@/interfaces/Category';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategoriesAction } from '@/actions/servicar/category/fetchCategories';
-import Loading from './CircularLoader';
 import CircularLoader from './CircularLoader';
+import { usePointsFilter } from '@/stores/pointsFilterStore';
 
 const ServiceTypeMenu = () => {
-    const [selectedServiceType, setServiceType] = useState<Category>();
+    
+    const { filter, setCategoryId } = usePointsFilter();
 
     const { data:serviceTypeList, isLoading } = useQuery({
       queryKey:['categories'],
@@ -19,8 +20,8 @@ const ServiceTypeMenu = () => {
 
 
     const handleServiceTypeChange = (type: Category) => {
-        if(type !== selectedServiceType){
-            setServiceType(type);
+        if(type.id !== filter.categoryId){
+            setCategoryId(type.id);
         }
       }
 
@@ -38,10 +39,11 @@ const ServiceTypeMenu = () => {
           <Button 
             key={index}
             onClick={() => handleServiceTypeChange(serviceType)} 
-            variant={selectedServiceType?.id === serviceType.id ? 'default': 'outline'} 
+            variant={filter.categoryId === serviceType.id ? 'default': 'outline'} 
             className={`flex flex-col items-center justify-center h-24 w-full gap-2 p-2 cursor-pointer
-              ${selectedServiceType?.id === serviceType.id ? "bg-[#383a49] text-white" : "bg-white text-black"}`}
+              ${filter.categoryId === serviceType.id ? "bg-[#383a49] text-white" : "bg-white text-black"}`}
           >
+          {serviceType.name.toLowerCase() === 'all' && <ListCheck scale={10} name='all' className='h-40 w-40'  />}
           {serviceType.name.toLowerCase() === 'fuel' && <Fuel scale={10} name='fuel' className='h-40 w-40'  />}
           {serviceType.name.toLowerCase() === 'maintenance' && <Settings className="h-6 w-6" />}
           {serviceType.name.toLowerCase() === 'car wash' && <CarTaxiFront className="h-6 w-6" />}

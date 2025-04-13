@@ -7,7 +7,7 @@ export async function fetchCategoriesAction(): Promise<Category[]> {
   try {
     const res = await axios.get('/category/get-all');
 
-    return res?.data;
+    return [{id:0, name: 'All'}, ...res?.data];
 
   } catch (err: unknown) {
     throw err;

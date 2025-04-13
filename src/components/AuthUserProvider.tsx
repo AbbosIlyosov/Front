@@ -40,7 +40,8 @@ export const AuthUserProvider: FC<AuthUserProviderProps> = ({ children }) => {
         setAuthenticatedUser(null); // Clear context if cookie is gone
         Swal.fire({
           text: 'Login session expired. Please login again.',
-          icon:'info'
+          icon:'info',
+          confirmButtonColor:'#383a49'
         })
         redirect('/login');
       }

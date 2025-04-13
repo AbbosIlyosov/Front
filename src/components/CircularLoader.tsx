@@ -3,7 +3,7 @@ import React from 'react';
 const CircularLoader = ({
   size = 48,
   strokeWidth = 4,
-  color = 'text-blue-500',
+  color = 'text-[#383a49]',
 }: {
   size?: number;
   strokeWidth?: number;

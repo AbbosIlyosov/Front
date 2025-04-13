@@ -1,7 +1,7 @@
 'use client';
 
 import { Search } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from './ui/input'
 import ServiceTypeMenu from './ServiceTypeMenu'
 import SelectList from './ui/select-list'
@@ -9,15 +9,42 @@ import { Button } from './ui/button'
 import { useQuery } from '@tanstack/react-query'
 import { fetchLocations } from '@/actions/servicar/location/fetchLocations'
 import { Location } from '@/interfaces/Location'
+import Swal from 'sweetalert2';
+import { usePointsFilter } from '@/stores/pointsFilterStore';
 
 const PointFilterCard = () => {
 
   const [selectedLocation, setSelectedLocation ] = useState<Location>();
 
+  const { filter, setLocationId, resetFilter } = usePointsFilter();
+
   const {data: locations, isLoading: locationLoading, error: locationError} = useQuery({
     queryKey: ['locations'],
     queryFn: fetchLocations
   })
+
+  useEffect(() => {
+    if(selectedLocation && selectedLocation.id !== filter.locationId){
+      setLocationId(selectedLocation.id);
+    }
+  }, [selectedLocation])
+
+  useEffect(() => {
+    if(filter.locationId !== selectedLocation?.id){
+      setSelectedLocation(locations?.find(x => x.id === filter.locationId))
+    }
+  }, [filter.locationId])
+
+  useEffect(() => {
+    if(locationError){
+      Swal.fire({
+        icon: 'error',
+        title: 'Error fetching locations!',
+        text: locationError.message,
+        confirmButtonColor: '#383a49'
+      })
+    }
+  }, [locationError])
 
   return (
     <div className='basis-xs shrink-0 flex flex-col gap-4 p-2'>
@@ -46,7 +73,7 @@ const PointFilterCard = () => {
 
         {/* Filter Button */}
         <div className="flex justify-end">
-            <Button className="mt-4 cursor-pointer">Filter</Button>
+            <Button onClick={resetFilter} className="mt-4 cursor-pointer">Reset Filter</Button>
           </div>
 
       </div>

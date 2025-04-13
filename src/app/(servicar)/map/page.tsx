@@ -2,7 +2,7 @@ import PointFilterCard from '@/components/PointFilterCard'
 import React from 'react'
 
 
-const PointsPage = () => {
+const MapsPage = () => {
   return (
     <main className='flex gap-0 h-[calc(100vh-80px)] overflow-hidden'>
       
@@ -17,4 +17,4 @@ const PointsPage = () => {
   )
 }
 
-export default PointsPage
+export default MapsPage

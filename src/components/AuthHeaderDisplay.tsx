@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { clearAuthCookies } from '@/lib/cookies';
 import Swal from 'sweetalert2';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const AuthHeaderDisplay = () => {
@@ -15,6 +15,7 @@ const AuthHeaderDisplay = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [ isHydrated, setIsHydrated] = useState<boolean>(false);
 
+  const router = useRouter();
 
   useEffect(() => {
     setIsHydrated(true);
@@ -38,7 +39,7 @@ const AuthHeaderDisplay = () => {
       timer:1000,
       showConfirmButton:false
     })
-    redirect('/login');
+    router.push('/login');
   }
 
   if(!isHydrated){

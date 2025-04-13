@@ -1,31 +1,33 @@
 
 'use client';
 
+import { fetchBusinessesForSelectList } from '@/actions/servicar/business/fetchAllBusinesses';
 import { fetchCategoriesAction } from '@/actions/servicar/category/fetchCategories';
+import { fetchLocations } from '@/actions/servicar/location/fetchLocations';
 import { createPointAction } from '@/actions/servicar/point/createPoint';
-import { FileUploader } from '@/components/FileUploader'
+import { fetchWorkingTimes } from '@/actions/servicar/working-time/fetchWorkingTime';
+import MultiSelectList from '@/components/multi-select-list';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import SelectList from '@/components/ui/select-list'
-import { Textarea } from '@/components/ui/textarea'
+import SelectList from '@/components/ui/select-list';
+import { BusinessSelectList } from '@/interfaces/Business';
 import { Category } from '@/interfaces/Category';
 import { CreatePointPayload } from '@/interfaces/CreatePointPayload';
+import { Location } from '@/interfaces/Location';
+import { WorkingTime } from '@/interfaces/WorkingTime';
 import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
 import { redirect, useRouter } from 'next/navigation';
 import React, { FormEvent, useEffect, useState } from 'react'
 import Swal from 'sweetalert2';
 
 const CreatePoint = () => {
     
-    // add email, name, categories, aboutUs, image
-    const [email, setEmail] = useState<string>('');
-    const [name, setName] = useState<string>('');
+    const [pointName, setPointName] = useState<string>('');
+    const [selectedWorkingTime, setSelectedWorkingTime] = useState<WorkingTime>();
+    const [selectedLocation, setSelectedLocation] = useState<Location>();
+    const [selectedBusiness, setSelectedBusiness] = useState<BusinessSelectList>();
     const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-    const [aboutUs, setAboutUs] = useState<string>('');
-    const [image, setImage] = useState<string>(''); // byte[] 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [error, setError] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -35,7 +37,23 @@ const CreatePoint = () => {
     const { data: categories, isLoading: categoryLoading, error: categoryError } = useQuery({
         queryKey: ['categories'],
         queryFn: fetchCategoriesAction
-    });      
+    });   
+    
+    const { data: businesses, isLoading: businessLoading, error: businessError } = useQuery({
+        queryKey: ['business-select-list'],
+        queryFn: fetchBusinessesForSelectList
+    });
+
+    const { data: locations, isLoading: locationLoading, error: locationError } = useQuery({
+        queryKey: ['locations'],
+        queryFn: fetchLocations
+    });
+
+    const { data: workingTimes, isLoading: workingTimeLoading, error: workingTimeError } = useQuery({
+        queryKey: ['working-time'],
+        queryFn: fetchWorkingTimes
+    });
+    
     
     useEffect(() => {
         if(categoryError){
@@ -44,24 +62,26 @@ const CreatePoint = () => {
                 title:'Error while fetching categories.',
                 text: categoryError.message,
             });
-        }
-    }, [categoryError])
-
-    useEffect(() => {
-        if(selectedFile){
-            resizeImageToBase64PNG(selectedFile, 600, 600)
-            .then((base64String) => {
-                setImage(base64String);
-            })
-            .catch((err) => {
-                Swal.fire({
-                    icon:'error',
-                    text: 'An unknown error occured. Please try again.',
-                    confirmButtonColor:'#383a49'
-                })
+        }else if(locationError){
+            Swal.fire({
+                icon:'error',
+                title:'Error while fetching location.',
+                text: locationError.message,
+            });
+        }else if(workingTimeError){
+            Swal.fire({
+                icon:'error',
+                title:'Error while fetching working time.',
+                text: workingTimeError.message,
+            });
+        }else if(businessError){
+            Swal.fire({
+                icon:'error',
+                title:'Error while fetching businesses.',
+                text: businessError.message,
             });
         }
-    }, [selectedFile])
+    }, [categoryError, locationError, workingTimeError, businessError])
     
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -69,27 +89,27 @@ const CreatePoint = () => {
         setError([]);
 
         // Form Validation
-        if (!email || !name || selectedCategories.length === 0 || !aboutUs) {
+        if (!pointName || !selectedBusiness ||  !selectedWorkingTime || !selectedLocation || selectedCategories.length === 0) {
             const newErrors: string[] = [];
 
-            if(!email){
-                newErrors.push('Email is required.');
+            if(!pointName){
+                newErrors.push('Point Name is required.');
             }
 
-            if(!name){
-                newErrors.push('Business Name is required.');
+            if(!selectedWorkingTime){
+                newErrors.push('Working time must be selected.');
+            }
+
+            if(!selectedLocation){
+                newErrors.push('Location must be selected.');
+            }
+
+            if(!selectedBusiness){
+                newErrors.push('Business must be selected.');
             }
 
             if(selectedCategories.length === 0){
                 newErrors.push('At least one category is required.')
-            }
-
-            if(!aboutUs){
-                newErrors.push('Abous Us field is required.');
-            }
-
-            if(!image){
-                newErrors.push('Business Logo is required.')
             }
 
             setError(newErrors);
@@ -97,17 +117,14 @@ const CreatePoint = () => {
             return;
         }
 
-        
         try {
             // Construct the payload
             const payload: CreatePointPayload = {
-                pointName: "Mock Point Name",
-                workingTimeId: 1,
-                locationId: 101,
-                businessId: 501,
-                categories: [1, 2, 3],
-                image: image, // assuming `image` is already a base64 string like "data:image/png;base64,..."
-                userId: 999,
+                pointName: pointName,
+                workingTimeId: selectedWorkingTime.id,
+                locationId: selectedLocation.id,
+                businessId: selectedBusiness.id,
+                categories: selectedCategories.flatMap((item) => item.id)
             };
   
             
@@ -144,68 +161,14 @@ const CreatePoint = () => {
     };
 
     const resetFormFields = () => {
-        setEmail('');
-        setName('');
+        setPointName('');
         setSelectedCategories([]);
-        setAboutUs('');
-        setImage(null);
-        setSelectedFile(null);
     }
-    
-    const resizeImageToBase64PNG = (
-        file: File,
-        maxWidth = 600,
-        maxHeight = 600
-      ): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          const reader = new FileReader();
       
-          reader.onload = (e) => {
-            if (!e.target?.result) return reject("Failed to read file");
-            img.src = e.target.result as string;
-          };
-      
-          img.onload = () => {
-            let width = img.width;
-            let height = img.height;
-      
-            if (width > maxWidth || height > maxHeight) {
-              const aspectRatio = width / height;
-              if (width > height) {
-                width = maxWidth;
-                height = Math.round(maxWidth / aspectRatio);
-              } else {
-                height = maxHeight;
-                width = Math.round(maxHeight * aspectRatio);
-              }
-            }
-      
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
-      
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return reject("Canvas context not found");
-      
-            ctx.drawImage(img, 0, 0, width, height);
-      
-            // Convert canvas to PNG Base64 string
-            const base64String = canvas.toDataURL("image/png"); // PNG format, no quality param
-            const base64WithoutPrefix = base64String.split(",")[1];
-      
-            resolve(base64WithoutPrefix);
-          };
-      
-          reader.readAsDataURL(file);
-        });
-      };
-      
-
   return (
-    <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative'>
+    <main className='h-[calc(100vh-80px)] overflow-auto p-5 relative'>
         <div 
-            className="absolute inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
+            className="fixed inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
             style={{backgroundImage: "url('/backgrounds/PointAppointmentBackground.png')"}}
         >
 
@@ -219,15 +182,16 @@ const CreatePoint = () => {
                 {error.length > 0 && <span className='text-red-600 border-1 border-red-500 px-3 py-3'>
                     {error.map((err, index) => (<p key={index}>{index + 1}. {err}</p>))}
                 </span>}
-                {/* email input */}
+
+                {/* Point Name input */}
                 <div className='space-y-2'>
                     <Label className='grow-1' htmlFor="pointName">Point Name: </Label>
                     <Input 
                         id="pointName"
                         type="text"
                         placeholder="Enter point name"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={pointName}
+                        onChange={(e) => setPointName(e.target.value)}
                         disabled={isLoading}
                         className='px-4 py-2'
                         required
@@ -236,72 +200,56 @@ const CreatePoint = () => {
 
                 {/* Workingtime input */}
                 <div className='space-y-2'>
-                    <Label htmlFor="categories">Working Time: </Label>
+                    <Label htmlFor="workingTime">Working Time: </Label>
                     <SelectList 
                         selectListLabel='Working Time' 
-                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
-                        selected={selectedCategories[0]}
-                        setSelected={() => setSelectedCategories(categories ?? [])}
-                        getOptionLabel={(item) => item.name}
+                        options={workingTimes ?? [{id: 0, name: workingTimeLoading ? 'Loading...' : 'No Options'}]} 
+                        selected={selectedWorkingTime}
+                        setSelected={setSelectedWorkingTime}
+                        getOptionLabel={(item) => `${item.name} (${item.startTime} | ${item.endTime})`}
                     />
                 </div>
 
                 {/* Location input */}
                 <div className='space-y-2'>
-                    <Label htmlFor="categories">Location: </Label>
+                    <Label htmlFor="location">Location: </Label>
                     <SelectList 
                         selectListLabel='City' 
-                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
-                        selected={selectedCategories[0]}
-                        setSelected={() => setSelectedCategories(categories ?? [])}
-                        getOptionLabel={(item) => item.name}
+                        options={locations ?? [{id: 0, city: locationLoading ? 'Loading...' : 'No Options'}]} 
+                        selected={selectedLocation}
+                        setSelected={setSelectedLocation}
+                        getOptionLabel={(item) => item.city}
                     />
                 </div>
 
                 {/* Business input */}
                 <div className='space-y-2'>
-                    <Label htmlFor="categories">Business: </Label>
+                    <Label htmlFor="business">Business: </Label>
                     <SelectList 
                         selectListLabel='Business' 
-                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
-                        selected={selectedCategories[0]}
-                        setSelected={() => setSelectedCategories(categories ?? [])}
+                        options={businesses ?? [{id: 0, name: businessLoading ? 'Loading...' : 'No Options'}]} 
+                        selected={selectedBusiness}
+                        setSelected={setSelectedBusiness}
                         getOptionLabel={(item) => item.name}
                     />
                 </div>
 
-                {/* Category input */}
-                 <div className='space-y-2'>
-                    <Label htmlFor="categories">Categories: </Label>
-                    <SelectList 
-                        selectListLabel='Categories' 
-                        options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
-                        selected={selectedCategories[0]}
-                        setSelected={() => setSelectedCategories(categories ?? [])}
-                        getOptionLabel={(item) => item.name}
-                    />
-                </div>
-
-                {/* Logo input */}
-                <div className='space-y-2'>
-                    <Label htmlFor="logo">Logo: </Label>
-                    {selectedFile ? (
-                        <div className="text-sm text-muted-foreground bg-gray-200 p-2 flex justify-between">
-                            <span className='text-lg font-semibold'>{selectedFile.name}</span>
-                            <X onClick={() => setSelectedFile(null)} color='red' className='hover:bg-gray-400 cursor-pointer' />
-                        </div>): 
-                        <FileUploader 
-                            label="Upload logo for the point"
-                            accept=".png,.jpg,.jpeg"
-                            onFileSelect={setSelectedFile}
-                        />
-                    }
+               {/* Category input */}
+               <div className='space-y-2'>
+                <Label htmlFor="categories">Categories: </Label>
+                <MultiSelectList 
+                    selectListLabel="Categories"
+                    options={categories ?? [{id: 0 , name: categoryLoading ? 'Loading...' : 'No Options'}]}
+                    selected={selectedCategories}
+                    setSelected={setSelectedCategories}
+                    getOptionLabel={(item) => item.name}
+                />
                 </div>
                 
-                <Button type='submit' className='w-full cursor-pointer bg-[#383a49]'>
+                <Button type='submit' className='w-full cursor-pointer bg-[#383a49]' disabled={isLoading}>
                     {isLoading ? 'Submitting...': 'Submit'}
                 </Button>
-                <Button variant={'outline'} onClick={() => router.back()} className='w-full cursor-pointer'>
+                <Button variant={'outline'} onClick={() => router.back()} className='w-full cursor-pointer' disabled ={isLoading}>
                     Back
                 </Button>
             </form>

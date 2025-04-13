@@ -1,37 +1,8 @@
 import PointFilterCard from '@/components/PointFilterCard'
 import PointGrid from '@/components/PointGrid'
-import ServiceTypeMenu from '@/components/ServiceTypeMenu'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import SelectList from '@/components/ui/select-list'
-import { Search } from 'lucide-react'
 import React from 'react'
 
-const uzbekistanCities = [
-  "Tashkent",
-  "Samarkand",
-  "Bukhara",
-  "Namangan",
-  "Andijan",
-  "Fergana",
-  "Nukus",
-  "Khiva",
-  "Termez",
-  "Kokand",
-  "Jizzakh",
-  "Gulistan",
-  "Navoi",
-  "Urganch",
-  "Qarshi",
-  "Margilan",
-  "Angren",
-  "Chirchiq",
-  "Shahrisabz",
-  "Zarafshon"
-];
-
-
-const MapPage = () => {
+const PointsPage = () => {
   return (
     <main className='flex gap-0 h-[calc(100vh-80px)] overflow-hidden'>
       
@@ -51,4 +22,4 @@ const MapPage = () => {
   )
 }
 
-export default MapPage
+export default PointsPage

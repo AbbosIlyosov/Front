@@ -69,7 +69,7 @@ const CreateBusiness = () => {
         setError([]);
 
         // Form Validation
-        if (!email || !name || selectedCategories.length === 0 || !aboutUs) {
+        if (!email || !name || !image || selectedCategories.length === 0 || !aboutUs) {
             const newErrors: string[] = [];
 
             if(!email){
@@ -145,8 +145,8 @@ const CreateBusiness = () => {
         setName('');
         setSelectedCategories([]);
         setAboutUs('');
-        setImage(null);
         setSelectedFile(null);
+        setImage('');
     }
     
     const resizeImageToBase64PNG = (
@@ -200,9 +200,9 @@ const CreateBusiness = () => {
       
 
   return (
-    <main className='h-[calc(100vh-80px)] overflow-hidden p-5 relative'>
+    <main className='h-[calc(100vh-80px)] overflow-auto p-5 relative'>
         <div 
-            className="absolute inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
+            className="fixed inset-0 bg-right bg-no-repeat -z-10 before:content-[''] before:fixed before:inset-0"
             style={{backgroundImage: "url('/backgrounds/PointAppointmentBackground.png')"}}
         >
 
@@ -264,7 +264,7 @@ const CreateBusiness = () => {
                     <Label htmlFor="aboutUs">About Us: </Label>
                     <Textarea 
                         id='aboutUs' 
-                        placeholder='Write about yuour business...' 
+                        placeholder='Write about your business...' 
                         value={aboutUs}
                         onChange={(e) =>  setAboutUs(e.target.value)}
                         disabled={isLoading}

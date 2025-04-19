@@ -1,39 +1,49 @@
 'use client';
 
 import { Search } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Input } from './ui/input'
 import ServiceTypeMenu from './ServiceTypeMenu'
 import SelectList from './ui/select-list'
 import { Button } from './ui/button'
 import { useQuery } from '@tanstack/react-query'
 import { fetchLocations } from '@/actions/servicar/location/fetchLocations'
-import { Location } from '@/interfaces/Location'
 import Swal from 'sweetalert2';
 import { usePointsFilter } from '@/stores/pointsFilterStore';
+import { fetchBusinessesForSelectList } from '@/actions/servicar/business/fetchAllBusinesses';
+
 
 const PointFilterCard = () => {
 
-  const [selectedLocation, setSelectedLocation ] = useState<Location>();
-
-  const { filter, setLocationId, resetFilter } = usePointsFilter();
+  const { filter, setLocation, setBusiness, resetFilter } = usePointsFilter();
 
   const {data: locations, isLoading: locationLoading, error: locationError} = useQuery({
     queryKey: ['locations'],
-    queryFn: fetchLocations
+    queryFn: async () => {
+      const result = await fetchLocations();
+      return [
+        {
+          id: 0,
+          city: 'All Cities'
+        },
+        ... result
+      ]
+    }
   })
 
-  useEffect(() => {
-    if(selectedLocation && selectedLocation.id !== filter.locationId){
-      setLocationId(selectedLocation.id);
-    }
-  }, [selectedLocation])
-
-  useEffect(() => {
-    if(filter.locationId !== selectedLocation?.id){
-      setSelectedLocation(locations?.find(x => x.id === filter.locationId))
-    }
-  }, [filter.locationId])
+  const { data: businesses, isLoading: businessLoading, error: businessError } = useQuery({
+      queryKey: ['business-select-list'],
+      queryFn: async () => {
+        const result = await fetchBusinessesForSelectList();
+        return [
+          {
+            id: 0,
+            name: 'All Businesses'
+          },
+          ... result
+        ]
+      }
+    }); 
 
   useEffect(() => {
     if(locationError){
@@ -46,8 +56,19 @@ const PointFilterCard = () => {
     }
   }, [locationError])
 
+  useEffect(() => {
+    if(businessError){
+      Swal.fire({
+        icon: 'error',
+        title: 'Error fetching businesses!',
+        text: businessError.message,
+        confirmButtonColor: '#383a49'
+      })
+    }
+  }, [businessError])
+
   return (
-    <div className='basis-xs shrink-0 flex flex-col gap-4 p-2'>
+    <div className='basis-xs shrink-0 flex flex-col gap-4 p-2 overflow-auto'>
 
         {/* Search bar */}
         <div className="relative mt-3 mb-3">
@@ -57,7 +78,17 @@ const PointFilterCard = () => {
             className="pl-9 w-full"
           />
         </div>
-      
+
+        {/* Business */}
+        <h2 className="font-medium px-1 mt-3">Business</h2>
+        <SelectList 
+          selectListLabel='Business' 
+          options={businesses ?? [{id:0, name: businessLoading ? 'Loading...' : 'Not Found'}]} 
+          selected={filter.business}
+          setSelected={setBusiness}
+          getOptionLabel={(option) => option.name}
+        />
+
         {/* Service Type */}
         <ServiceTypeMenu/>
 
@@ -66,8 +97,8 @@ const PointFilterCard = () => {
         <SelectList 
           selectListLabel='City' 
           options={locations ?? [{id:0, city: locationLoading ? 'Loading...' : 'Not Found'}]} 
-          selected={selectedLocation}
-          setSelected={setSelectedLocation}
+          selected={filter.location}
+          setSelected={setLocation}
           getOptionLabel={(option) => option.city}
         />
 

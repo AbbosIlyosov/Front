@@ -46,7 +46,7 @@ const CreatePoint = () => {
 
     const { data: locations, isLoading: locationLoading, error: locationError } = useQuery({
         queryKey: ['locations'],
-        queryFn: fetchLocations
+        queryFn:fetchLocations
     });
 
     const { data: workingTimes, isLoading: workingTimeLoading, error: workingTimeError } = useQuery({
@@ -61,24 +61,28 @@ const CreatePoint = () => {
                 icon:'error',
                 title:'Error while fetching categories.',
                 text: categoryError.message,
+                confirmButtonColor:'#383a49'
             });
         }else if(locationError){
             Swal.fire({
                 icon:'error',
                 title:'Error while fetching location.',
                 text: locationError.message,
+                confirmButtonColor:'#383a49'
             });
         }else if(workingTimeError){
             Swal.fire({
                 icon:'error',
                 title:'Error while fetching working time.',
                 text: workingTimeError.message,
+                confirmButtonColor: '#383a49'
             });
         }else if(businessError){
             Swal.fire({
                 icon:'error',
                 title:'Error while fetching businesses.',
                 text: businessError.message,
+                confirmButtonColor: '#383a49'
             });
         }
     }, [categoryError, locationError, workingTimeError, businessError])

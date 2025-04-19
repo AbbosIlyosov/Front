@@ -11,7 +11,7 @@ import { usePointsFilter } from '@/stores/pointsFilterStore';
 
 const ServiceTypeMenu = () => {
     
-    const { filter, setCategoryId } = usePointsFilter();
+    const { filter, setCategory } = usePointsFilter();
 
     const { data:serviceTypeList, isLoading } = useQuery({
       queryKey:['categories'],
@@ -19,9 +19,9 @@ const ServiceTypeMenu = () => {
     })
 
 
-    const handleServiceTypeChange = (type: Category) => {
-        if(type.id !== filter.categoryId){
-            setCategoryId(type.id);
+    const handleServiceTypeChange = (category: Category) => {
+        if(category.id !== filter.category.id){
+            setCategory(category);
         }
       }
 
@@ -39,9 +39,9 @@ const ServiceTypeMenu = () => {
           <Button 
             key={index}
             onClick={() => handleServiceTypeChange(serviceType)} 
-            variant={filter.categoryId === serviceType.id ? 'default': 'outline'} 
+            variant={filter.category.id === serviceType.id ? 'default': 'outline'} 
             className={`flex flex-col items-center justify-center h-24 w-full gap-2 p-2 cursor-pointer
-              ${filter.categoryId === serviceType.id ? "bg-[#383a49] text-white" : "bg-white text-black"}`}
+              ${filter.category.id === serviceType.id ? "bg-[#383a49] text-white" : "bg-white text-black"}`}
           >
           {serviceType.name.toLowerCase() === 'all' && <ListCheck scale={10} name='all' className='h-40 w-40'  />}
           {serviceType.name.toLowerCase() === 'fuel' && <Fuel scale={10} name='fuel' className='h-40 w-40'  />}

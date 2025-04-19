@@ -1,49 +1,57 @@
 // store/usePointsFilter.ts
-import { PointsFilterParams } from '@/interfaces/Point'
+import { BusinessSelectList } from '@/interfaces/Business'
+import { Category } from '@/interfaces/Category'
+import { Location } from '@/interfaces/Location'
+import { PointFilter } from '@/interfaces/Point'
 import { create } from 'zustand'
 
 interface PointsFilter {
-  filter: PointsFilterParams
-  setCategoryId: (id: number) => void
-  setLocationId: (id: number) => void
-  setBusinessId: (id: number) => void
+  filter: PointFilter
+  setCategory: (category: Category) => void
+  setLocation: (location: Location) => void
+  setBusiness: (business: BusinessSelectList) => void
   resetFilter: () => void
 }
 
-const initialState:PointsFilterParams = {
-  businessId: 0,
-  categoryId: 0,
-  locationId: 0
+const initialState:PointFilter = {
+  business: {
+    id: 0,
+    name: 'All Businesses'
+  },
+  category: {
+    id: 0,
+    name: 'All'
+  },
+  location: {
+    id: 0,
+    city: 'All Cities'
+  }
 }
 
 export const usePointsFilter = create<PointsFilter>((set) => ({
-  filter: {
-    businessId: 0,
-    categoryId: 0,
-    locationId: 0
-  },
+  filter: initialState,
 
-  setCategoryId: (id: number) =>
+  setCategory: (category: Category) =>
     set((state) => ({
       filter: {
         ...state.filter,
-        categoryId: id
+        category: category
       }
     })),
 
-  setLocationId: (id: number) =>
+  setLocation: (location: Location) =>
     set((state) => ({
       filter: {
         ...state.filter,
-        locationId: id
+        location: location
       }
     })),
 
-  setBusinessId: (id: number) =>
+  setBusiness: (business: BusinessSelectList) =>
     set((state) => ({
       filter: {
         ...state.filter,
-        businessId: id
+        business: business
       }
     })),
 

@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react'
 import PointCard from './PointCard'
 import { useRouter } from 'next/navigation';
-import { Button } from './ui/button';
 import { PointsGridInfo } from '@/interfaces/Point';
 import { useQuery } from '@tanstack/react-query';
 import CircularLoader from './CircularLoader';
@@ -19,8 +18,12 @@ const PointGrid = () => {
   const { filter } = usePointsFilter();
 
   const { data: points, isLoading, error } = useQuery({
-    queryKey: ['points-for-grid',filter.businessId, filter.categoryId, filter.locationId],
-    queryFn: () => fetchPointsForGrid(filter)
+    queryKey: ['points-for-grid',filter.business.id, filter.category.id, filter.location.id],
+    queryFn: () => fetchPointsForGrid({
+      businessId: filter.business.id,
+      locationId: filter.location.id,
+      categoryId: filter.category.id 
+    })
   })
 
    useEffect(() => {
@@ -35,7 +38,11 @@ const PointGrid = () => {
    }, [error])
 
   const handleClickCard = (point:PointsGridInfo) => {
-    router.push('/points/' + point.id + '/appointments');
+    const query = new URLSearchParams({
+      name: point.pointName
+    }).toString()
+  
+    router.push(`/points/${point.id}/appointments?${query}`)
   }
 
   if(isLoading){

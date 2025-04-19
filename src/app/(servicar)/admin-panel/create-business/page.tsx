@@ -4,6 +4,7 @@
 import { createBusiness } from '@/actions/servicar/business/createBusiness';
 import { fetchCategoriesAction } from '@/actions/servicar/category/fetchCategories';
 import { FileUploader } from '@/components/FileUploader'
+import MultiSelectList from '@/components/multi-select-list';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,6 +44,7 @@ const CreateBusiness = () => {
                 icon:'error',
                 title:'Error while fetching categories.',
                 text: categoryError.message,
+                confirmButtonColor: '#383a49'
             });
         }
     }, [categoryError])
@@ -69,12 +71,12 @@ const CreateBusiness = () => {
         setError([]);
 
         // Form Validation
-        if (!email || !name || !image || selectedCategories.length === 0 || !aboutUs) {
+        if (!name || !image || selectedCategories.length === 0 || !aboutUs) {
             const newErrors: string[] = [];
 
-            if(!email){
-                newErrors.push('Email is required.');
-            }
+            // if(!email){
+            //     newErrors.push('Email is required.');
+            // }
 
             if(!name){
                 newErrors.push('Business Name is required.');
@@ -108,8 +110,6 @@ const CreateBusiness = () => {
                 image: image
             };
             
-            console.log('payload', payload);
-
             const { success, errorMessage } = await createBusiness(payload);
 
             if (success) {
@@ -217,7 +217,7 @@ const CreateBusiness = () => {
                     {error.map((err, index) => (<p key={index}>{index + 1}. {err}</p>))}
                 </span>}
                 {/* email input */}
-                <div className='space-y-2'>
+                {/* <div className='space-y-2'>
                     <Label className='grow-1' htmlFor="email">Email: </Label>
                     <Input 
                         id="email"
@@ -229,7 +229,7 @@ const CreateBusiness = () => {
                         className='px-4 py-2'
                         required
                     />
-                </div>
+                </div> */}
 
                 {/* businessName input */}
                 <div className='space-y-2'>
@@ -250,11 +250,11 @@ const CreateBusiness = () => {
                 {/* Category input */}
                  <div className='space-y-2'>
                     <Label htmlFor="categories">Categories: </Label>
-                    <SelectList 
+                    <MultiSelectList 
                         selectListLabel='Categories' 
                         options={categories ?? [{id: 0, name: categoryLoading ? 'Loading...' : 'Categories not found!'}]} 
-                        selected={selectedCategories[0]}
-                        setSelected={() => setSelectedCategories(categories ?? [])}
+                        selected={selectedCategories}
+                        setSelected={setSelectedCategories}
                         getOptionLabel={(item) => item.name}
                     />
                 </div>

@@ -8,6 +8,7 @@ import { clearAuthCookies } from '@/lib/cookies';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { getInitials } from '@/helpers/getInitials';
 
 const AuthHeaderDisplay = () => {
   const { authenticatedUser, setAuthenticatedUser } = useAuthUser();
@@ -24,10 +25,6 @@ const AuthHeaderDisplay = () => {
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   }
-
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  };
 
   const logout = () => {
     clearAuthCookies();

@@ -44,6 +44,7 @@ const Login = () => {
             title: 'Oops!',
             text: res?.error || 'Login failed. Check your credentials and try again.',
             icon: 'error',
+            confirmButtonColor:'#383a49'
           });
         }
   
@@ -53,6 +54,7 @@ const Login = () => {
           title: 'Oops!',
           text: message,
           icon: 'error',
+          confirmButtonColor: '#383a49'
         });
       }
     });

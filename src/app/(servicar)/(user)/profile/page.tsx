@@ -3,6 +3,7 @@
 import { useAuthUser } from '@/components/AuthUserProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { getInitials } from '@/helpers/getInitials';
 import React, { FC, useEffect, useState } from 'react'
 
 type EditProfileProps = {
@@ -59,10 +60,6 @@ type ProfileInfoProps = {
 export const ProfileInfoCard:FC<ProfileInfoProps> = ({changeInfo, changePassword, switchToWorkerAccount}) => {
 
     const {authenticatedUser} = useAuthUser();
-
-    const getInitials = (firstName: string, lastName:string): string => {
-        return `${firstName[0]}${lastName[0]}`.toUpperCase()
-    };
 
   return (
     <div className='border-2 border-black rounded-2xl min-h-4/5 w-xl px-10 py-5 flex flex-col gap-5'>
